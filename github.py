@@ -9,38 +9,17 @@ def run_command(command):
     else:
         print(stdout.decode('utf-8'))
 
-def convert_folder_to_git(folder_path, remote_url=None, token=None):
-    # Check if the folder exists
-    if not os.path.isdir(folder_path):
-        print(f"The folder '{folder_path}' does not exist.")
-        return
-
-    # Change to the target directory
-    os.chdir(folder_path)
-    
-    # Initialize the Git repository
-    run_command("git init")
-
-    # Add all files to the repository
+def git_add_all():
     run_command("git add .")
 
-    # Commit the files
-    run_command('git commit -m "Initial commit"')
+def git_commit(message):
+    run_command(f'git commit -m "{message}"')
 
-    # Add remote repository if provided
-    if remote_url and token:
-        # Parse the remote_url to include the token
-        auth_remote_url = remote_url.replace("https://", f"https://{token}@")
-        run_command(f"git remote add origin {auth_remote_url}")
-        run_command("git push -u origin master")
-    elif remote_url:
-        run_command(f"git remote add origin {remote_url}")
-        run_command("git push -u origin master")
+def git_push(branch="master"):
+    run_command(f"git push origin {branch}")
 
 if __name__ == "__main__":
-    # Tentukan path folder, URL remote repository, dan token di sini
-    folder_path = "/home/yoan/TUGASAKHIR"
-    remote_url = "https://github.com/joenav23/TUGASAKHIR.git"
-    token = "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"  # Ganti dengan personal access token yang sesuai
-    
-    convert_folder_to_git(folder_path, remote_url, token)
+    # Langkah-langkah
+    git_add_all()
+    git_commit("Menambahkan file hasil scan dan laporan penetrasi")
+    git_push()
