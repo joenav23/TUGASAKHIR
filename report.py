@@ -51,89 +51,171 @@ def create_cover_page(document):
     Date: {date.today().strftime('%d %B %Y')}
     Version 1.0"""
     document.add_paragraph(text)
+
+def add_pendahuluan(document):
+    document.add_heading("Pendahuluan", level=2)
+    pendahuluan_paragraph = document.add_paragraph()
+    pendahuluan_paragraph.alignment = WD_PARAGRAPH_ALIGNMENT.JUSTIFY  # Rata kanan-kiri
+    pendahuluan_text = (
+        "Laporan ini disusun sebagai hasil pengujian penetrasi terhadap CVE-2022-46169, "
+        "sebuah kerentanan yang ditemukan dalam perangkat lunak Cacti. Kerentanan ini "
+        "memungkinkan serangan tanpa autentikasi untuk melakukan eksekusi perintah sistem "
+        "secara sewenang-wenang pada server yang menjalankan Cacti. Dalam laporan ini, kami "
+        "akan memberikan detail mengenai temuan kerentanan CVE-2022-46169 yang kami identifikasi "
+        "selama penilaian. Kami akan menjelaskan dengan rinci potensi dampak dan risiko yang "
+        "terkait dengan kerentanan ini, serta memberikan rekomendasi tindakan untuk memperbaiki "
+        "kerentanan tersebut dan meningkatkan keamanan sistem secara menyeluruh."
+    )
+    pendahuluan_paragraph.add_run(pendahuluan_text)
+
+def add_ruang_lingkup(document):
+    document.add_heading("Ruang Lingkup", level=2)
+    ruang_lingkup_paragraph = document.add_paragraph()
+    ruang_lingkup_paragraph.alignment = WD_PARAGRAPH_ALIGNMENT.JUSTIFY  # Rata kanan-kiri
+    ruang_lingkup_text = (
+        "Evaluasi keamanan sistem informasi pada Cacti dilakukan di lingkungan produksi "
+        "dengan melakukan upaya peretasan berdasarkan kerentanan yang ditemukan. Host dan "
+        "alamat IP yang diuji adalah sebagai berikut:"
+    )
+    ruang_lingkup_paragraph.add_run(ruang_lingkup_text)
     
+    # Add the hosts and IP addresses
+    hosts = [
+        ("Sistem Utama", "10.33.102.224"),
+        ("Target", "10.33.102.212"),
+        ("Target", "10.33.102.225"),
+        ("Target", "10.33.102.226")
+    ]
+    for host, ip in hosts:
+        document.add_paragraph(f"- Host: {host}, IP: {ip}", style='List Bullet')
+
+def add_metodologi(document):
+    document.add_heading("Metodologi", level=2)
+    metodologi_paragraph = document.add_paragraph()
+    metodologi_paragraph.alignment = WD_PARAGRAPH_ALIGNMENT.JUSTIFY # Rata kanan-kiri
+    metodologi_text = (
+        "Metodologi yang digunakan dalam pengujian penetrasi ini terdiri dari beberapa tahap "
+        "yang sistematis untuk memastikan pengujian yang menyeluruh dan efektif. Tahap-tahap "
+        "ini meliputi information gathering, vulnerability scanning, vulnerability analysis, "
+        "vulnerability exploitation, recommendation and reporting. Metodologi ini dirancang untuk "
+        "mengidentifikasi dan mengatasi potensi celah keamanan dalam sistem secara menyeluruh."
+    )
+    metodologi_paragraph.add_run(metodologi_text)
 
 
+def add_vulnerability_identification(document):
+    document.add_heading("Identifikasi Kerentanan", level=2)
+    identification_paragraph = document.add_paragraph()
+    identification_paragraph.alignment = WD_PARAGRAPH_ALIGNMENT.JUSTIFY # Rata kanan-kiri
+    identification_text = (
+        "Pemindaian menggunakan Nmap pada alamat IP 10.33.102.212, 10.33.102.225, dan 10.33.102.226 "
+        "dilakukan dengan perintah nmap -sV -sC -Pn --script http-title -iL targets.txt -oN nmap_results.txt. "
+        "Perintah ini digunakan untuk memindai jaringan terhadap sejumlah alamat IP yang terdaftar dalam file targets.txt. "
+        "Hasil pemindaian mencakup identifikasi versi perangkat lunak yang berjalan, eksekusi skrip otomatis untuk analisis keamanan, "
+        "dan pengambilan judul halaman utama dari server web yang terdeteksi. Informasi hasil pemindaian akan disimpan dalam file "
+        "nmap_results.txt untuk referensi dan analisis lebih lanjut."
+    )
+    identification_paragraph.add_run(identification_text)
 
-def generate_findings(document):
-    # Add the introduction section
-    document.add_heading("Introduction", level=2)
-    intro_paragraph = document.add_paragraph()
-    intro_paragraph.alignment = WD_PARAGRAPH_ALIGNMENT.JUSTIFY
-    intro_text = """Laporan ini disusun sebagai hasil pengujian penetrasi terhadap CVE-2022-46169, sebuah kerentanan yang ditemukan dalam perangkat lunak Cacti. Kerentanan ini memungkinkan serangan tanpa autentikasi untuk melakukan eksekusi perintah sistem secara sewenang-wenang pada server yang menjalankan Cacti. Dalam laporan ini, kami akan memberikan detail mengenai temuan kerentanan CVE-2022-46169 yang kami identifikasi selama penilaian. Kami akan menjelaskan dengan rinci potensi dampak dan risiko yang terkait dengan kerentanan ini, serta memberikan rekomendasi tindakan untuk memperbaiki kerentanan tersebut dan meningkatkan keamanan sistem secara menyeluruh."""
-    intro_paragraph.add_run(intro_text)
-    
-    # Add the executive summary section
-    vuln_devices = []
-    scan_devices = []
-    with open("nmap_results.txt", 'r') as f_vuln:
-        lines = f_vuln.readlines()
-    i = 0
-    while i < len(lines):
-        line = lines[i].strip()
-        if "Nmap scan report for" in line:
-            ip_address = line.split()[-1]
-            cacti_detected = False
-            for j in range(i, min(i + 10, len(lines))):  # Periksa 10 baris berikutnya untuk keberadaan Cacti
-                if "http-title: Login to Cacti" in lines[j]:
-                    cacti_detected = True
-                    break
-            if cacti_detected:
-                scan_devices.append((ip_address, "Cacti Detected"))
-            else:
-                scan_devices.append((ip_address, "No Cacti Detected"))
-        i += 1
-
-    with open("vuln_scan.txt", 'r') as f_vuln:
-        lines = f_vuln.readlines()
-    i = 0
-    while i < len(lines):
-        line = lines[i].strip()
-        if "========== Vulnerability Scan Result for" in line:
-            ip_address = line.split()[-1]
-            if i + 5 < len(lines):
-                status_line = lines[i+5].strip()
-                if "The target appears to be vulnerable. The target is Cacti version 1.2.22" in status_line:
-                    vuln_devices.append((ip_address, "CVE-2022-46169 Vulnerability Detected"))
-                else:
-                    vuln_devices.append((ip_address, "CVE-2022-46169 Vulnerability Detected"))
-        i += 1
-
-    document.add_heading("Executive Summary", level=2)
-    if scan_devices:
-        document.add_paragraph("Scanned Devices:")
-    for device in scan_devices:
-        document.add_paragraph(f"- {device[0]}: {device[1]}")
-    if vuln_devices:
-        document.add_paragraph("Vulnerable Devices:")
-    for device in vuln_devices:
-        document.add_paragraph(f"- {device[0]}: {device[1]}")
-
-    summary_paragraph = document.add_paragraph()
-    summary_paragraph.alignment = WD_PARAGRAPH_ALIGNMENT.JUSTIFY
-    summary_text = "Pada " + date.today().strftime('%d %B %Y') + ", kami melaksanakan uji penetrasi dengan menggunakan pengetahuan sebelumnya tentang lingkungan internal atau dengan menggunakan kredensial yang kami miliki sebelumnya. Tujuannya adalah untuk menemukan kelemahan keamanan dan menguji kemungkinan pengeksploitasian celah tersebut. Pengujian dilakukan secara otomatis dengan menggunakan alat khusus yang dirancang untuk mendeteksi kerentanan CVE-2022-46169 pada Cacti. Kerentanan CVE-2022-46169 merupakan kerentanan eksekusi kode dari jarak jauh pada Cacti. Kerentanan ini terjadi karena adanya kecacatan pada file remote_agent.php. File ini dapat diakses tanpa perlu otentikasi, sehingga dapat dimanfaatkan oleh penyerang untuk melakukan eksekusi kode dari jarak jauh."""
-    summary_paragraph.add_run(summary_text)
-
-
-    # Add the Nmap scan section
-    document.add_heading("Scan Target", level=2)
+    # Adding content from nmap_results.txt
     with open("nmap_results.txt", "r") as scan_file:
         scan_content = scan_file.read()
     document.add_paragraph(scan_content)
+    
+    scan_results = (
+        "\n\nHasil pemindaian menunjukkan bahwa pada alamat IP 10.33.102.212:\n"
+        "- Port 22/tcp terbuka dengan layanan SSH menggunakan OpenSSH versi 8.2p1 pada Ubuntu.\n"
+        "- Port 80/tcp terbuka dengan layanan HTTP menggunakan Apache HTTP Server versi 2.4.54 pada Debian, "
+        "judul halamannya adalah 'Login to Cacti'.\n"
+        "- Port 8086/tcp terbuka dengan layanan HTTP untuk InfluxDB versi 1.6.4 tanpa judul halaman.\n"
+        "- Sistem operasi yang terdeteksi adalah Linux.\n\n"
+        
+        "Pada alamat IP 10.33.102.225:\n"
+        "- Port 22/tcp terbuka dengan layanan SSH menggunakan OpenSSH versi 8.2p1 pada Ubuntu.\n"
+        "- Port 80/tcp terbuka dengan layanan HTTP menggunakan Apache HTTP Server versi 2.4.54 pada Debian, "
+        "judul halamannya adalah 'Login to Cacti'.\n"
+        "- Sistem operasi yang terdeteksi adalah Linux.\n\n"
+        
+        "Pada alamat IP 10.33.102.226:\n"
+        "- Port 22/tcp terbuka dengan layanan SSH menggunakan OpenSSH versi 8.9p1 pada Ubuntu.\n"
+        "- Port 80/tcp terbuka dengan layanan HTTP menggunakan Apache HTTP Server versi 2.4.52 pada Ubuntu, "
+        "judul halamannya adalah 'Login to Cacti'.\n"
+        "- Sistem operasi yang terdeteksi adalah Linux.\n\n"
+        
+        "Informasi hasil pemindaian ini disimpan dalam file nmap_results.txt untuk referensi dan analisis lebih lanjut."
+    )
+    
+    document.add_paragraph(scan_results)
+    
+def add_vulnerability_scanning(document):
+    document.add_heading("Vulnerability Scanning", level=2)
+    scanning_paragraph = document.add_paragraph()
+    scanning_paragraph.alignment = WD_PARAGRAPH_ALIGNMENT.JUSTIFY  # Rata kanan-kiri
+    scanning_text = (
+        "Vulnerability scanning dilakukan menggunakan perangkat lunak Metasploit. Metasploit adalah open-source, "
+        "platform pengujian penetrasi berbasis Ruby yang memungkinkan pengguna untuk menulis, menguji, dan mengeksekusi "
+        "kode eksploit. Sistem pengujian penetrasi atau pengujian pena bekerja dengan mensimulasikan serangan cyber untuk "
+        "memeriksa kerentanan yang rentan. Dibawah ini menampilkan hasil dari pemindaian kerentanan yang ditemukan oleh Metasploit."
+    )
+    scanning_paragraph.add_run(scanning_text)
+    
+    # Add vulnerability scan results from file
+    with open("vuln_scan.txt", "r") as vuln_file:
+        vuln_content = vuln_file.read()
+    document.add_paragraph(vuln_content)
+    
+    # Add additional information about specific vulnerabilities
+    additional_info = (
+        "Metasploit melakukan pemindaian kerentanan pada target sistem dan berhasil mengidentifikasi bahwa alamat IP "
+        "10.33.102.212 dan 10.33.102.225, pada port 80, menjalankan aplikasi Cacti versi 1.2.22 yang rentan, dengan "
+        "celah keamanan yang dapat dieksploitasi. Sementara itu, target dengan alamat IP 10.33.102.226 menjalankan aplikasi "
+        "Cacti versi 1.2.27 yang tidak rentan terhadap eksploitasi yang sama seperti versi sebelumnya, mungkin karena telah "
+        "diperbarui atau diperbaiki untuk menutup kerentanan yang ada pada versi 1.2.22."
+    )
+    document.add_paragraph(additional_info)
 
-    # Add the Proof of Concept section
-    document.add_heading("Exploitabel", level=2)
-    with open("exploit.txt", "r") as exploit_file:
+def add_vulnerability_exploitation(document):
+    document.add_heading("Vulnerability Exploitation", level=2)
+    exploitation_paragraph = document.add_paragraph()
+    exploitation_paragraph.alignment = WD_PARAGRAPH_ALIGNMENT.JUSTIFY  # Rata kanan-kiri
+    exploitation_text = (
+        "Pada bagian ini, dilakukan beberapa serangan untuk menguji kerentanan yang telah "
+        "diidentifikasi sebelumnya. Serangan pertama adalah eksploitasi kerentanan Command Injection "
+        "pada aplikasi Cacti menggunakan Metasploit. Langkah ini dilakukan untuk memanfaatkan celah "
+        "keamanan yang ditemukan dalam versi 1.2.22 dari Cacti, dengan tujuan memperoleh akses ilegal "
+        "ke dalam sistem yang rentan."
+    )
+    exploitation_paragraph.add_run(exploitation_text)
+    document.add_paragraph("10.33.102.212")
+    with open("10.33.102.212_exploit.txt", "r") as exploit_file:
         exploit_content = exploit_file.read()
     document.add_paragraph(exploit_content)
 
-    # Add the Recommendations section
+    document.add_paragraph("10.33.102.225")
+    with open("10.33.102.225_exploit.txt", "r") as exploit_file:
+        exploit_content = exploit_file.read()
+    document.add_paragraph(exploit_content)
+
+    # Add additional information about exploitation
+    additional_info = (
+        "Metasploit berhasil mengeksploitasi kerentanan yang ada pada aplikasi Cacti versi 1.2.22 yang dijalankan pada "
+        "alamat IP 10.33.102.212 dan 10.33.102.225 dengan menggunakan port 80. Dalam proses eksploitasi ini, Metasploit "
+        "menggunakan payload linux/x86/meterpreter/reverse_tcp untuk menciptakan koneksi TCP terbalik dari target ke alamat "
+        "IP Metasploit (10.33.102.224) pada port 4444. Meskipun awalnya eksploitasi tidak menghasilkan sesi Meterpreter, "
+        "setelah beberapa upaya tambahan termasuk bruteforce terhadap host_id dan local_data_id, Metasploit berhasil memperoleh akses.\n\n"
+        "Hasilnya, sesi Meterpreter berhasil dibuka, memberikan penyerang kontrol penuh terhadap sistem target. Melalui sesi ini, "
+        "penyerang menggunakan perintah ls -la untuk menjelajahi isi direktori dari perspektif pengguna www-data. Informasi yang "
+        "diperoleh dari hasil eksekusi perintah tersebut memungkinkan penyerang untuk memahami struktur file serta hak akses yang "
+        "terkait dengan aplikasi Cacti yang disusupi."
+    )
+    exploitation_paragraph.add_run(additional_info) 
+
+def add_recommendations(document):
     document.add_heading("Recommendation", level=2)
     recommendations_paragraph = document.add_paragraph()
-    recommendations_paragraph.alignment = WD_PARAGRAPH_ALIGNMENT.JUSTIFY
+    recommendations_paragraph.alignment = WD_PARAGRAPH_ALIGNMENT.JUSTIFY  # Rata kanan-kiri
     recommendations_text = "Untuk mengurangi risiko dari CVE-2022-46169, disarankan untuk mengambil langkah-langkah berikut:"
     recommendations_paragraph.add_run(recommendations_text)
-
 
     # Add the recommendations list
     recommendations_list = [
@@ -145,9 +227,7 @@ def generate_findings(document):
     ]
     for recommendation in recommendations_list:
         document.add_paragraph(recommendation, style='List Bullet')
-    
-    # Save the document
-    document.save("Penetration_Test_Report.docx")
+
 
 def generate_report():
     # Create a new Word document
@@ -156,9 +236,31 @@ def generate_report():
     # Generate the cover page
     create_cover_page(document)
 
-    # Generate the findings page
-    generate_findings(document)
+    # Add Pendahuluan
+    add_pendahuluan(document)
 
+    # Add Ruang Lingkup
+    add_ruang_lingkup(document)
+
+    # Add Metodologi
+    add_metodologi(document)
+
+    # Add Vulnerability Identification
+    add_vulnerability_identification(document)
+
+    # Add Vulnerability Scanning
+    add_vulnerability_scanning(document)
+
+    # Add Vulnerability Exploitation
+    add_vulnerability_exploitation(document)
+
+    # Add Recommendations
+    add_recommendations(document)
+
+    # Save the document
+    document.save("Penetration_Test_Report.docx")
+
+    # Convert to PDF
     subprocess.run(["unoconv", "-f", "pdf", "Penetration_Test_Report.docx"], stderr=subprocess.DEVNULL)
 
     print("Penetration test report generated successfully.")
