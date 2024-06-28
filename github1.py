@@ -21,8 +21,8 @@ def git_push(branch="master", token=""):
     run_command(f"git push origin {branch}")
 
 if __name__ == "__main__":
-    # Langkah-langkah
-    token = "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"  # Ganti dengan token yang benar
+    # Tentukan token yang benar di sini
+    token = "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"  # Ganti dengan token yang benar
     git_add_all()
     git_commit("Menambahkan file hasil scan dan laporan penetrasi")
     git_push(token=token)
