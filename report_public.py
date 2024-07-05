@@ -237,7 +237,7 @@ def generate_report(output_file):
     add_recommendations(document)
 
     # Save the document
-    document.save("Penetration_Test_Report.docx")
+    document.save("Penetration_Test_Report_Public.docx")
 
     # Convert to PDF
     subprocess.run(["unoconv", "-f", "pdf", "Penetration_Test_Report_Public.docx"], stderr=subprocess.DEVNULL)
