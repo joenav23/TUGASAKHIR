@@ -240,7 +240,7 @@ def generate_report(output_file):
     document.save("Penetration_Test_Report.docx")
 
     # Convert to PDF
-    subprocess.run(["unoconv", "-f", "pdf", "Penetration_Test_Report.docx"], stderr=subprocess.DEVNULL)
+    subprocess.run(["unoconv", "-f", "pdf", "Penetration_Test_Report_Public.docx"], stderr=subprocess.DEVNULL)
 
     print("Penetration test report generated successfully.")
 
