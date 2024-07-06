@@ -128,7 +128,7 @@ def detect_cacti_vulnerability(ip, port, level):
         vulnerability_output = re.sub(r"\x1b\[[0-9;]*[mK]", "", vuln_result)
         with open(f"{ip}_vuln.txt", "w") as f:
             f.write(vulnerability_output)
-
+        
         if level == "Medium" and result == "Cacti vulnerability detected.":
             user_input = input(f"Cacti vulnerability detected. {ip}:{port}. Do you want to exploit it? (Y/N): ")
             if user_input.strip().lower() != 'y':
@@ -204,7 +204,7 @@ def detect_and_exploit_vulnerabilities_from_file(filename, lhost, level):
                     print(f"No vulnerability file found for {ip}")
 
     print("Check and exploitation completed.")
-
+                    
 def detect_and_exploit_vulnerabilities_from_public(filename, lhost, level):
     with open(filename, "r") as file:
         lines = file.readlines()
