@@ -82,7 +82,6 @@ def add_ruang_lingkup(document):
     # Add the hosts and IP addresses
     hosts = [
         ("Sistem Utama", "10.33.102.224"),
-        ("Target", "10.33.102.212"),
         ("Target", "10.33.102.225"),
         ("Target", "10.33.102.226")
     ]
@@ -108,7 +107,7 @@ def add_vulnerability_identification(document):
     identification_paragraph = document.add_paragraph()
     identification_paragraph.alignment = WD_PARAGRAPH_ALIGNMENT.JUSTIFY # Rata kanan-kiri
     identification_text = (
-        "Pemindaian menggunakan Nmap pada alamat IP 10.33.102.212, 10.33.102.225, dan 10.33.102.226 "
+        "Pemindaian menggunakan Nmap pada alamat IP 10.33.102.225, dan 10.33.102.226 "
         "dilakukan dengan perintah nmap -sV -sC -Pn --script http-title -iL targets.txt -oN nmap_results.txt. "
         "Perintah ini digunakan untuk memindai jaringan terhadap sejumlah alamat IP yang terdaftar dalam file targets.txt. "
         "Hasil pemindaian mencakup identifikasi versi perangkat lunak yang berjalan, eksekusi skrip otomatis untuk analisis keamanan, "
@@ -123,14 +122,7 @@ def add_vulnerability_identification(document):
     document.add_paragraph(scan_content)
     
     scan_results = (
-        "\n\nHasil pemindaian menunjukkan bahwa pada alamat IP 10.33.102.212:\n"
-        "- Port 22/tcp terbuka dengan layanan SSH menggunakan OpenSSH versi 8.2p1 pada Ubuntu.\n"
-        "- Port 80/tcp terbuka dengan layanan HTTP menggunakan Apache HTTP Server versi 2.4.54 pada Debian, "
-        "judul halamannya adalah 'Login to Cacti'.\n"
-        "- Port 8086/tcp terbuka dengan layanan HTTP untuk InfluxDB versi 1.6.4 tanpa judul halaman.\n"
-        "- Sistem operasi yang terdeteksi adalah Linux.\n\n"
-        
-        "Pada alamat IP 10.33.102.225:\n"
+        "\n\nHasil pemindaian menunjukkan bahwa Pada alamat IP 10.33.102.225:\n"
         "- Port 22/tcp terbuka dengan layanan SSH menggunakan OpenSSH versi 8.2p1 pada Ubuntu.\n"
         "- Port 80/tcp terbuka dengan layanan HTTP menggunakan Apache HTTP Server versi 2.4.54 pada Debian, "
         "judul halamannya adalah 'Login to Cacti'.\n"
@@ -167,7 +159,7 @@ def add_vulnerability_scanning(document):
     # Add additional information about specific vulnerabilities
     additional_info = (
         "Metasploit melakukan pemindaian kerentanan pada target sistem dan berhasil mengidentifikasi bahwa alamat IP "
-        "10.33.102.212 dan 10.33.102.225, pada port 80, menjalankan aplikasi Cacti versi 1.2.22 yang rentan, dengan "
+        "10.33.102.225, pada port 80, menjalankan aplikasi Cacti versi 1.2.22 yang rentan, dengan "
         "celah keamanan yang dapat dieksploitasi. Sementara itu, target dengan alamat IP 10.33.102.226 menjalankan aplikasi "
         "Cacti versi 1.2.27 yang tidak rentan terhadap eksploitasi yang sama seperti versi sebelumnya, mungkin karena telah "
         "diperbarui atau diperbaiki untuk menutup kerentanan yang ada pada versi 1.2.22."
@@ -185,11 +177,6 @@ def add_vulnerability_exploitation(document):
         "keamanan yang ditemukan dalam versi 1.2.22 dari Cacti, dengan tujuan memperoleh akses ilegal "
         "ke dalam sistem yang rentan."
     )
-    exploitation_paragraph.add_run(exploitation_text)
-    document.add_paragraph("10.33.102.212")
-    with open("10.33.102.212_exploit.txt", "r") as exploit_file:
-        exploit_content = exploit_file.read()
-    document.add_paragraph(exploit_content)
 
     document.add_paragraph("10.33.102.225")
     with open("10.33.102.225_exploit.txt", "r") as exploit_file:
