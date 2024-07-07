@@ -15,7 +15,7 @@ def git_add_all():
 def git_commit(message):
     run_command(f'git commit -m "{message}"')
 
-def git_push(branch="master"):
+def git_push(branch="main"):
     run_command(f"git push origin {branch}")
 
 if __name__ == "__main__":
